@@ -15,6 +15,8 @@ export interface GroupFixture {
   entry1Id: string;
   entry2Id: string;
   result: 'entry1' | 'entry2' | 'draw' | null;
+  score1: number | null;
+  score2: number | null;
   round: number;
   createdAt: number;
 }
@@ -26,6 +28,9 @@ export interface GroupStanding {
   won: number;
   drawn: number;
   lost: number;
+  for: number;
+  against: number;
+  goalDiff: number;
   points: number;
 }
 
@@ -58,6 +63,8 @@ export async function getGroupFixtures(groupId: string): Promise<GroupFixture[]>
     entry1Id:    r['entry1_id'] as string,
     entry2Id:    r['entry2_id'] as string,
     result:      r['result'] as GroupFixture['result'],
+    score1:      r['score1'] as number | null,
+    score2:      r['score2'] as number | null,
     round:       r['round'] as number,
     createdAt:   r['created_at'] as number,
   }));
@@ -66,9 +73,14 @@ export async function getGroupFixtures(groupId: string): Promise<GroupFixture[]>
 export async function setFixtureResult(
   fixtureId: string,
   result: GroupFixture['result'],
+  score1: number | null = null,
+  score2: number | null = null,
 ): Promise<void> {
   const db = await getDb();
-  await db.run('UPDATE group_fixtures SET result = ? WHERE id = ?', [result, fixtureId]);
+  await db.run(
+    'UPDATE group_fixtures SET result = ?, score1 = ?, score2 = ? WHERE id = ?',
+    [result, score1, score2, fixtureId],
+  );
 }
 
 export function computeStandings(
@@ -83,7 +95,7 @@ export function computeStandings(
     map.set(entryId, {
       entryId,
       displayName: nameMap.get(entryId) ?? entryId,
-      played: 0, won: 0, drawn: 0, lost: 0, points: 0,
+      played: 0, won: 0, drawn: 0, lost: 0, for: 0, against: 0, goalDiff: 0, points: 0,
     });
   }
 
@@ -95,6 +107,11 @@ export function computeStandings(
 
     s1.played++;
     s2.played++;
+
+    if (f.score1 != null && f.score2 != null) {
+      s1.for += f.score1; s1.against += f.score2;
+      s2.for += f.score2; s2.against += f.score1;
+    }
 
     if (f.result === 'entry1') {
       s1.won++;   s1.points += 3;
@@ -108,9 +125,15 @@ export function computeStandings(
     }
   }
 
+  for (const s of map.values()) {
+    s.goalDiff = s.for - s.against;
+  }
+
+  // Tie-break order: points, then goal difference, then goals scored, then name.
   return [...map.values()].sort((a, b) => {
     if (b.points !== a.points) return b.points - a.points;
-    if (b.won !== a.won) return b.won - a.won;
+    if (b.goalDiff !== a.goalDiff) return b.goalDiff - a.goalDiff;
+    if (b.for !== a.for) return b.for - a.for;
     return a.displayName.localeCompare(b.displayName);
   });
 }
@@ -144,27 +167,24 @@ export async function createGroups(
   // Generate round-robin fixtures for each group
   const { generateRoundRobin } = await import('@/lib/scheduler');
   const now = Date.now();
+  const BYE = '__BYE__';
 
   for (const g of groups) {
     const memberRes = await db.query('SELECT entry_id FROM group_members WHERE group_id = ?', [g.id]);
-    let memberIds = (memberRes.values ?? []).map((r) => r['entry_id'] as string);
+    const memberIds = (memberRes.values ?? []).map((r) => r['entry_id'] as string);
 
-    if (memberIds.length % 2 !== 0) {
-      const byeId = uuid();
-      await db.run(
-        'INSERT INTO entries (id,tournament_id,display_name,seed,is_bye,created_at) VALUES (?,?,?,?,?,?)',
-        [byeId, tournamentId, 'BYE', null, 1, now],
-      );
-      await db.run('INSERT INTO group_members (group_id,entry_id) VALUES (?,?)', [g.id, byeId]);
-      memberIds.push(byeId);
-    }
+    // generateRoundRobin requires an even number of teams. For odd-sized groups,
+    // pad with a placeholder "bye" slot — fixtures involving it are dropped, so
+    // the group simply has one team sitting out each round (no BYE entry/match).
+    const scheduleIds = memberIds.length % 2 !== 0 ? [...memberIds, BYE] : memberIds;
 
-    const fixtures = generateRoundRobin(memberIds);
+    const fixtures = generateRoundRobin(scheduleIds);
     for (const f of fixtures) {
+      if (f.homeTeamId === BYE || f.awayTeamId === BYE) continue;
       await db.run(
-        `INSERT INTO group_fixtures (id,group_id,tournament_id,entry1_id,entry2_id,result,round,created_at)
-         VALUES (?,?,?,?,?,?,?,?)`,
-        [uuid(), g.id, tournamentId, f.homeTeamId, f.awayTeamId, null, f.week, now],
+        `INSERT INTO group_fixtures (id,group_id,tournament_id,entry1_id,entry2_id,result,score1,score2,round,created_at)
+         VALUES (?,?,?,?,?,?,?,?,?,?)`,
+        [uuid(), g.id, tournamentId, f.homeTeamId, f.awayTeamId, null, null, null, f.week, now],
       );
     }
   }

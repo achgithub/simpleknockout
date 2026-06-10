@@ -11,18 +11,26 @@
     "cap:ios": "npx cap open ios"
   },
   "dependencies": {
+    "@capacitor-community/admob": "^8.0.0",
     "@capacitor-community/sqlite": "^6.0.2",
     "@capacitor/app": "^6.0.2",
     "@capacitor/core": "^6.2.0",
+    "@capacitor/filesystem": "^8.1.2",
     "@capacitor/haptics": "^6.0.2",
     "@capacitor/ios": "^6.2.0",
     "@capacitor/keyboard": "^6.0.2",
+    "@capacitor/share": "^8.0.1",
     "@capacitor/status-bar": "^6.0.2",
+    "@revenuecat/purchases-capacitor": "^13.1.5",
     "clsx": "^2.1.1",
+    "html-to-image": "^1.11.13",
+    "i18next": "^26.3.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-i18next": "^17.0.8",
     "react-router-dom": "^6.26.2",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@capacitor/cli": "^6.2.0",

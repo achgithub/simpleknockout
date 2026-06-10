@@ -71,6 +71,8 @@ CREATE TABLE IF NOT EXISTS group_fixtures (
   entry1_id      TEXT NOT NULL REFERENCES entries(id),
   entry2_id      TEXT NOT NULL REFERENCES entries(id),
   result         TEXT CHECK(result IN ('entry1','entry2','draw',NULL)),
+  score1         INTEGER,
+  score2         INTEGER,
   round          INTEGER NOT NULL,
   created_at     INTEGER NOT NULL
 );
@@ -94,9 +96,33 @@ CREATE TABLE IF NOT EXISTS app_settings (
   key    TEXT PRIMARY KEY,
   value  TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS user_groups (
+  id         TEXT PRIMARY KEY,
+  name       TEXT NOT NULL,
+  created_at INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS users (
+  id         TEXT PRIMARY KEY,
+  name       TEXT NOT NULL,
+  created_at INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS user_group_members (
+  user_id  TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  group_id TEXT NOT NULL REFERENCES user_groups(id) ON DELETE CASCADE,
+  PRIMARY KEY (user_id, group_id)
+);
 `;
 
 async function runMigrations(conn: SQLiteDBConnection): Promise<void> {
   await conn.run('PRAGMA foreign_keys = ON', []);
   await conn.execute(SCHEMA);
+
+  // Older installs won't have score columns on group_fixtures — add them if missing.
+  const cols = await conn.query('PRAGMA table_info(group_fixtures)');
+  const colNames = new Set((cols.values ?? []).map((r) => r['name'] as string));
+  if (!colNames.has('score1')) await conn.execute('ALTER TABLE group_fixtures ADD COLUMN score1 INTEGER');
+  if (!colNames.has('score2')) await conn.execute('ALTER TABLE group_fixtures ADD COLUMN score2 INTEGER');
 }

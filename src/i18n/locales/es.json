@@ -1,0 +1,215 @@
+{
+  "common": {
+    "back": "‹ Atrás",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "close": "Cerrar",
+    "all": "Todos",
+    "ungrouped": "Sin grupo",
+    "draw": "Empate",
+    "undo": "Deshacer",
+    "vs": "vs",
+    "tbd": "Por determinar",
+    "addPlayer": "Añadir jugador",
+    "playerNamePlaceholder": "Nombre del jugador",
+    "tournamentNamePlaceholder": "Nombre del torneo",
+    "noPlayersInGroup": "No hay jugadores en este grupo.",
+    "exporting": "Exportando…",
+    "importing": "Importando…",
+    "format": {
+      "straightKnockout": "Eliminación directa",
+      "groupKnockout": "Grupos + Eliminatoria"
+    },
+    "entrySize": {
+      "singles": "Individual",
+      "pairs": "Parejas",
+      "triples": "Tríos"
+    },
+    "status": {
+      "registration": "Inscripción",
+      "group_stage": "Grupos",
+      "knockout": "Eliminatoria",
+      "completed": "Finalizado"
+    }
+  },
+  "home": {
+    "newButton": "+ Nuevo",
+    "noTournaments": "Aún no hay torneos.",
+    "createTournament": "Crear torneo",
+    "confirmDelete": "¿Eliminar este torneo?"
+  },
+  "newTournament": {
+    "title": "Nuevo torneo",
+    "basics": "Datos básicos",
+    "gamePlaceholder": "Juego (p. ej. Billar, Dardos, Tenis de mesa)",
+    "format": "Formato",
+    "entryType": "Tipo de inscripción",
+    "options": "Opciones",
+    "seeding": "Sorteo",
+    "randomDraw": "Sorteo aleatorio",
+    "seeded": "Cabezas de serie",
+    "thirdPlacePlayoff": "Tercer y cuarto puesto",
+    "advancePerGroup": "Clasifican por grupo",
+    "topN": "Mejores {{count}}",
+    "creating": "Creando…",
+    "createTournament": "Crear torneo"
+  },
+  "dashboard": {
+    "entriesRegistered_one": "{{count}} inscrito registrado",
+    "entriesRegistered_other": "{{count}} inscritos registrados",
+    "bracketSizeInfo": "Tamaño del cuadro: {{size}} ({{rounds}} rondas, {{byes}} byes)",
+    "manageEntries": "Gestionar inscripciones ({{count}})",
+    "numberOfGroups": "Número de grupos",
+    "groupsCount_one": "{{count}} grupo",
+    "groupsCount_other": "{{count}} grupos",
+    "drawingGroups": "Sorteando grupos…",
+    "startGroupStage": "Iniciar fase de grupos",
+    "drawingBracket": "Generando cuadro…",
+    "generateBracket": "Generar cuadro",
+    "viewGroups": "Ver grupos",
+    "startingKnockout": "Iniciando eliminatoria…",
+    "startKnockoutPhase": "Iniciar fase eliminatoria",
+    "viewBracket": "Ver cuadro"
+  },
+  "register": {
+    "title": "Inscripciones",
+    "browsePlayers": "Explorar jugadores…",
+    "entriesCount_one": "{{count}} inscrito",
+    "entriesCount_other": "{{count}} inscritos",
+    "seedPlaceholder": "Cabeza",
+    "addFromPlayers": "Añadir desde jugadores",
+    "pickMorePlayers_one": "Elige {{count}} jugador más",
+    "pickMorePlayers_other": "Elige {{count}} jugadores más",
+    "playerN": "Jugador {{n}}",
+    "entered": "inscrito",
+    "selected": "seleccionado"
+  },
+  "groups": {
+    "title": "Grupos",
+    "configureTelegram": "Configura Telegram en los ajustes del torneo primero.",
+    "telegramError": "Error de Telegram: {{message}}",
+    "share": "Compartir →",
+    "noGroups": "Aún no hay grupos.",
+    "tabs": {
+      "league": "Liga",
+      "fixtures": "Partidos"
+    },
+    "table": {
+      "name": "Nombre",
+      "played": "J",
+      "won": "G",
+      "drawn": "E",
+      "lost": "P",
+      "gd": "DG",
+      "points": "Pts"
+    },
+    "round": "Ronda {{number}}",
+    "won": "Ganó: {{name}}",
+    "advancement": {
+      "baseOneGroup": "{{groups}} grupo · clasifican los {{count}} primeros ({{total}} en total)",
+      "baseMultiGroup": "{{groups}} grupos · clasifican los {{count}} primeros de cada uno ({{total}} en total)",
+      "exact": "Completa un cuadro de {{size}} exactamente.",
+      "extrasRanked_one": "+ el mejor equipo {{rank}} también clasifica",
+      "extrasRanked_other": "+ los mejores {{count}} equipos {{rank}} también clasifican",
+      "extrasGeneric_one": "+ el mejor equipo fuera de las plazas directas también clasifica",
+      "extrasGeneric_other": "+ los mejores {{count}} equipos fuera de las plazas directas también clasifican",
+      "byes_one": "{{count}} exención cubre la plaza restante del cuadro",
+      "byes_other": "{{count}} exenciones cubren las plazas restantes del cuadro",
+      "toBracket": "→ Cuadro de {{size}}."
+    }
+  },
+  "bracket": {
+    "title": "Cuadro",
+    "shareBracket": "Compartir cuadro",
+    "thirdPlacePlayoff": "Tercer y cuarto puesto",
+    "tournamentChampion": "Campeón del torneo",
+    "final": "⚡ Final",
+    "byeAdvances": "Bye — avanza {{name}}",
+    "enterResult": "Introducir resultado",
+    "scorePlaceholder": "Puntos",
+    "wins": "Gana {{name}}"
+  },
+  "players": {
+    "title": "Jugadores",
+    "addGroup": "+ Grupo",
+    "addPlayer": "+ Jugador",
+    "deleteGroup": "Eliminar grupo",
+    "confirmDeleteGroup": "¿Eliminar este grupo? Los jugadores quedarán sin grupo.",
+    "noPlayersYet": "Aún no hay jugadores.",
+    "addFirstPlayer": "Añadir primer jugador",
+    "groupsButton": "Grupos",
+    "addPlayerTitle": "Añadir jugador",
+    "groupsOptional": "Grupos (opcional)",
+    "addGroupTitle": "Añadir grupo",
+    "groupNamePlaceholder": "Nombre del grupo",
+    "addGroupButton": "Añadir grupo",
+    "noGroupsYet": "Aún no hay grupos. Añade uno desde la pestaña Jugadores.",
+    "groupsForUser": "Grupos — {{name}}"
+  },
+  "settings": {
+    "title": "Ajustes",
+    "tournament": "Torneo",
+    "telegram": "Telegram",
+    "telegramDescription": "Crea un bot con @BotFather, añádelo a tu canal como administrador y pega aquí las credenciales.",
+    "botTokenPlaceholder": "Token del bot (123456:ABC-...)",
+    "channelIdPlaceholder": "ID del canal (p. ej. @micanal o -100123456789)",
+    "data": "Datos",
+    "exportDatabase": "Exportar base de datos",
+    "exportNativeOnly": "La exportación de la base de datos solo está disponible en el dispositivo.",
+    "exportPlaceholder": "Exportar: configura @capacitor/share apuntando al archivo de base de datos SQLite.",
+    "deleteTournament": "Eliminar torneo",
+    "confirmDelete": "¿Eliminar este torneo? Esta acción no se puede deshacer."
+  },
+  "diagnostics": {
+    "title": "Diagnóstico",
+    "appVersion": "Versión de la app",
+    "platform": "Plataforma",
+    "isNative": "Es nativo",
+    "userAgent": "User Agent"
+  },
+  "tabBar": {
+    "knockouts": "Torneos",
+    "players": "Jugadores",
+    "settings": "Ajustes"
+  },
+  "entryInput": {
+    "playerNNamePlaceholder": "Nombre del jugador {{n}}",
+    "addPair": "Añadir pareja",
+    "addTriple": "Añadir trío"
+  },
+  "adBanner": {
+    "advertisement": "Publicidad"
+  },
+  "appSettings": {
+    "textSize": "Tamaño del texto",
+    "fontScale": {
+      "normal": "Normal",
+      "normalSub": "Tamaño predeterminado",
+      "large": "Grande",
+      "largeSub": "Un poco más grande",
+      "xl": "Extra grande",
+      "xlSub": "El más grande"
+    },
+    "language": "Idioma",
+    "languageOptions": {
+      "auto": "Automático",
+      "autoSub": "Según el idioma del dispositivo",
+      "en": "Inglés",
+      "es": "Español"
+    },
+    "translationNotice": "Idioma original: inglés. Todas las traducciones se han generado con inteligencia artificial. Si algo falta o no es correcto, por favor avísanos.",
+    "playersSection": "Jugadores",
+    "exportPlayers": "Exportar jugadores (XLSX)",
+    "importPlayers": "Importar jugadores (XLSX)",
+    "importedPlayers_one": "Se importó {{count}} jugador nuevo.",
+    "importedPlayers_other": "Se importaron {{count}} jugadores nuevos.",
+    "knockoutsSection": "Torneos",
+    "shareKnockoutJson": "Compartir cuadro (JSON)",
+    "noKnockoutTournaments": "Aún no hay torneos eliminatorios.",
+    "importKnockout": "Importar torneo (iCloud)",
+    "importedKnockout": "Se importó \"{{name}}\". Abriendo cuadro…",
+    "version": "Versión {{version}}",
+    "oneMoreTap": "Una vez más…"
+  }
+}

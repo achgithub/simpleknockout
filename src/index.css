@@ -5,6 +5,7 @@
 :root {
   --safe-top: env(safe-area-inset-top);
   --safe-bottom: env(safe-area-inset-bottom);
+  --ad-banner-height: 50px;
 }
 
 html, body, #root {

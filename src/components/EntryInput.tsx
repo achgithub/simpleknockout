@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from './Button';
 
 interface Props {
@@ -7,6 +8,7 @@ interface Props {
 }
 
 export function EntryInput({ entrySize, onCommit }: Props) {
+  const { t } = useTranslation();
   const [names, setNames] = useState<string[]>(Array(entrySize).fill(''));
 
   const update = (i: number, val: string) => {
@@ -27,7 +29,7 @@ export function EntryInput({ entrySize, onCommit }: Props) {
         <input
           key={i}
           type="text"
-          placeholder={entrySize === 1 ? 'Player name' : `Player ${i + 1} name`}
+          placeholder={entrySize === 1 ? t('common.playerNamePlaceholder') : t('entryInput.playerNNamePlaceholder', { n: i + 1 })}
           value={name}
           onChange={(e) => update(i, e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter' && i === entrySize - 1) commit(); }}
@@ -35,7 +37,7 @@ export function EntryInput({ entrySize, onCommit }: Props) {
         />
       ))}
       <Button onClick={commit} disabled={!ready}>
-        {entrySize === 1 ? 'Add Player' : `Add ${entrySize === 2 ? 'Pair' : 'Triple'}`}
+        {entrySize === 1 ? t('common.addPlayer') : entrySize === 2 ? t('entryInput.addPair') : t('entryInput.addTriple')}
       </Button>
     </div>
   );

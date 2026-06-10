@@ -1,0 +1,215 @@
+{
+  "common": {
+    "back": "‹ Back",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving…",
+    "close": "Close",
+    "all": "All",
+    "ungrouped": "Ungrouped",
+    "draw": "Draw",
+    "undo": "Undo",
+    "vs": "vs",
+    "tbd": "TBD",
+    "addPlayer": "Add Player",
+    "playerNamePlaceholder": "Player name",
+    "tournamentNamePlaceholder": "Tournament name",
+    "noPlayersInGroup": "No players in this group.",
+    "exporting": "Exporting…",
+    "importing": "Importing…",
+    "format": {
+      "straightKnockout": "Straight Knockout",
+      "groupKnockout": "Groups + Knockout"
+    },
+    "entrySize": {
+      "singles": "Singles",
+      "pairs": "Pairs",
+      "triples": "Triples"
+    },
+    "status": {
+      "registration": "Registration",
+      "group_stage": "Groups",
+      "knockout": "Knockout",
+      "completed": "Completed"
+    }
+  },
+  "home": {
+    "newButton": "+ New",
+    "noTournaments": "No tournaments yet.",
+    "createTournament": "Create Tournament",
+    "confirmDelete": "Delete this tournament?"
+  },
+  "newTournament": {
+    "title": "New Tournament",
+    "basics": "Basics",
+    "gamePlaceholder": "Game (e.g. Pool, Darts, Table Tennis)",
+    "format": "Format",
+    "entryType": "Entry Type",
+    "options": "Options",
+    "seeding": "Seeding",
+    "randomDraw": "Random draw",
+    "seeded": "Seeded",
+    "thirdPlacePlayoff": "3rd place playoff",
+    "advancePerGroup": "Advance per group",
+    "topN": "Top {{count}}",
+    "creating": "Creating…",
+    "createTournament": "Create Tournament"
+  },
+  "dashboard": {
+    "entriesRegistered_one": "{{count}} entry registered",
+    "entriesRegistered_other": "{{count}} entries registered",
+    "bracketSizeInfo": "Bracket size: {{size}} ({{rounds}} rounds, {{byes}} byes)",
+    "manageEntries": "Manage Entries ({{count}})",
+    "numberOfGroups": "Number of groups",
+    "groupsCount_one": "{{count}} group",
+    "groupsCount_other": "{{count}} groups",
+    "drawingGroups": "Drawing groups…",
+    "startGroupStage": "Start Group Stage",
+    "drawingBracket": "Drawing bracket…",
+    "generateBracket": "Generate Bracket",
+    "viewGroups": "View Groups",
+    "startingKnockout": "Starting knockout…",
+    "startKnockoutPhase": "Start Knockout Phase",
+    "viewBracket": "View Bracket"
+  },
+  "register": {
+    "title": "Entries",
+    "browsePlayers": "Browse Players…",
+    "entriesCount_one": "{{count}} entry",
+    "entriesCount_other": "{{count}} entries",
+    "seedPlaceholder": "Seed",
+    "addFromPlayers": "Add from Players",
+    "pickMorePlayers_one": "Pick {{count}} more player",
+    "pickMorePlayers_other": "Pick {{count}} more players",
+    "playerN": "Player {{n}}",
+    "entered": "entered",
+    "selected": "selected"
+  },
+  "groups": {
+    "title": "Groups",
+    "configureTelegram": "Configure Telegram in tournament settings first.",
+    "telegramError": "Telegram error: {{message}}",
+    "share": "Share →",
+    "noGroups": "No groups yet.",
+    "tabs": {
+      "league": "League",
+      "fixtures": "Fixtures"
+    },
+    "table": {
+      "name": "Name",
+      "played": "P",
+      "won": "W",
+      "drawn": "D",
+      "lost": "L",
+      "gd": "GD",
+      "points": "Pts"
+    },
+    "round": "Round {{number}}",
+    "won": "Won: {{name}}",
+    "advancement": {
+      "baseOneGroup": "{{groups}} group · top {{count}} advance ({{total}} total)",
+      "baseMultiGroup": "{{groups}} groups · top {{count}} from each advance ({{total}} total)",
+      "exact": "Fills a bracket of {{size}} exactly.",
+      "extrasRanked_one": "+ the best {{count}} {{rank}}-placed team also advances",
+      "extrasRanked_other": "+ the best {{count}} {{rank}}-placed teams also advance",
+      "extrasGeneric_one": "+ the best {{count}} team outside the automatic spots also advances",
+      "extrasGeneric_other": "+ the best {{count}} teams outside the automatic spots also advance",
+      "byes_one": "{{count}} bye fills the remaining bracket slot",
+      "byes_other": "{{count}} byes fill the remaining bracket slots",
+      "toBracket": "→ Bracket of {{size}}."
+    }
+  },
+  "bracket": {
+    "title": "Bracket",
+    "shareBracket": "Share bracket",
+    "thirdPlacePlayoff": "3rd Place Playoff",
+    "tournamentChampion": "Tournament Champion",
+    "final": "⚡ Final",
+    "byeAdvances": "Bye — {{name}} advances",
+    "enterResult": "Enter Result",
+    "scorePlaceholder": "Score",
+    "wins": "{{name}} wins"
+  },
+  "players": {
+    "title": "Players",
+    "addGroup": "+ Group",
+    "addPlayer": "+ Player",
+    "deleteGroup": "Delete group",
+    "confirmDeleteGroup": "Delete this group? Players will become ungrouped from it.",
+    "noPlayersYet": "No players yet.",
+    "addFirstPlayer": "Add First Player",
+    "groupsButton": "Groups",
+    "addPlayerTitle": "Add Player",
+    "groupsOptional": "Groups (optional)",
+    "addGroupTitle": "Add Group",
+    "groupNamePlaceholder": "Group name",
+    "addGroupButton": "Add Group",
+    "noGroupsYet": "No groups yet. Add one from the Players tab.",
+    "groupsForUser": "Groups — {{name}}"
+  },
+  "settings": {
+    "title": "Settings",
+    "tournament": "Tournament",
+    "telegram": "Telegram",
+    "telegramDescription": "Create a bot via @BotFather, add it to your channel as admin, then paste the credentials below.",
+    "botTokenPlaceholder": "Bot token (123456:ABC-...)",
+    "channelIdPlaceholder": "Channel ID (e.g. @mychannel or -100123456789)",
+    "data": "Data",
+    "exportDatabase": "Export Database",
+    "exportNativeOnly": "DB export is only available on device.",
+    "exportPlaceholder": "Export: wire up @capacitor/share pointing to the SQLite DB file.",
+    "deleteTournament": "Delete Tournament",
+    "confirmDelete": "Delete this tournament? This cannot be undone."
+  },
+  "diagnostics": {
+    "title": "Diagnostics",
+    "appVersion": "App Version",
+    "platform": "Platform",
+    "isNative": "Is Native",
+    "userAgent": "User Agent"
+  },
+  "tabBar": {
+    "knockouts": "Knockouts",
+    "players": "Players",
+    "settings": "Settings"
+  },
+  "entryInput": {
+    "playerNNamePlaceholder": "Player {{n}} name",
+    "addPair": "Add Pair",
+    "addTriple": "Add Triple"
+  },
+  "adBanner": {
+    "advertisement": "Advertisement"
+  },
+  "appSettings": {
+    "textSize": "Text Size",
+    "fontScale": {
+      "normal": "Normal",
+      "normalSub": "Default text size",
+      "large": "Large",
+      "largeSub": "Slightly bigger",
+      "xl": "Extra Large",
+      "xlSub": "Largest"
+    },
+    "language": "Language",
+    "languageOptions": {
+      "auto": "Automatic",
+      "autoSub": "Match device language",
+      "en": "English",
+      "es": "Spanish"
+    },
+    "translationNotice": "Original language: English. All translations were generated by AI. Please report anything that's missing or incorrect.",
+    "playersSection": "Players",
+    "exportPlayers": "Export Players (XLSX)",
+    "importPlayers": "Import Players (XLSX)",
+    "importedPlayers_one": "Imported {{count}} new player.",
+    "importedPlayers_other": "Imported {{count}} new players.",
+    "knockoutsSection": "Knockouts",
+    "shareKnockoutJson": "Share Knockout JSON",
+    "noKnockoutTournaments": "No knockout tournaments yet.",
+    "importKnockout": "Import Knockout (iCloud)",
+    "importedKnockout": "Imported \"{{name}}\". Opening bracket…",
+    "version": "Version {{version}}",
+    "oneMoreTap": "One more tap…"
+  }
+}

@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useDbReady } from '@/hooks/useDb';
 import { Home } from '@/pages/Home';
 import { NewTournament } from '@/pages/NewTournament';
@@ -7,6 +7,13 @@ import { Register } from '@/pages/Register';
 import { Groups } from '@/pages/Groups';
 import { Bracket } from '@/pages/Bracket';
 import { Settings } from '@/pages/Settings';
+import { AppSettings } from '@/pages/AppSettings';
+import { Players } from '@/pages/Players';
+import { Diagnostics } from '@/pages/Diagnostics';
+import { TabBar } from '@/components/TabBar';
+import { AdBanner } from '@/components/AdBanner';
+
+const TAB_PATHS = ['/', '/players', '/settings'];
 
 export function App() {
   const { ready, error } = useDbReady();
@@ -28,16 +35,35 @@ export function App() {
     );
   }
 
+  return <Shell />;
+}
+
+// Single root shell: scrollable routed content, with the TabBar (on tab
+// routes) and the ad banner pinned below it. Both are rendered once at the
+// root so the native ad overlay isn't repeatedly shown/hidden on navigation.
+function Shell() {
+  const { pathname } = useLocation();
+  const isTabRoute = TAB_PATHS.includes(pathname);
+
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/tournament/new" element={<NewTournament />} />
-      <Route path="/tournament/:id" element={<Dashboard />} />
-      <Route path="/tournament/:id/register" element={<Register />} />
-      <Route path="/tournament/:id/groups" element={<Groups />} />
-      <Route path="/tournament/:id/bracket" element={<Bracket />} />
-      <Route path="/tournament/:id/settings" element={<Settings />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <div className="flex flex-col" style={{ height: '100dvh' }}>
+      <div className="flex-1 overflow-y-auto min-h-0">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/players" element={<Players />} />
+          <Route path="/settings" element={<AppSettings />} />
+          <Route path="/diagnostics" element={<Diagnostics />} />
+          <Route path="/tournament/new" element={<NewTournament />} />
+          <Route path="/tournament/:id" element={<Dashboard />} />
+          <Route path="/tournament/:id/register" element={<Register />} />
+          <Route path="/tournament/:id/groups" element={<Groups />} />
+          <Route path="/tournament/:id/bracket" element={<Bracket />} />
+          <Route path="/tournament/:id/settings" element={<Settings />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </div>
+      {isTabRoute && <TabBar />}
+      <AdBanner />
+    </div>
   );
 }

@@ -1,39 +1,49 @@
-// PLACEHOLDER — integrate RevenueCat Capacitor SDK here.
-// https://www.revenuecat.com/docs/capacitor
-//
-// Steps when ready:
-//  1. npm install @revenuecat/purchases-capacitor
-//  2. Replace stub below with Purchases.configure({ apiKey: YOUR_KEY })
-//  3. Define entitlement IDs and map them to features below
+import { Capacitor } from '@capacitor/core';
+import { Purchases, LOG_LEVEL } from '@revenuecat/purchases-capacitor';
+import { REVENUECAT_API_KEY_IOS, RC_ENTITLEMENT_NO_ADS, RC_ENTITLEMENT_PRO } from './config';
 
 export interface Entitlements {
-  unlimited: boolean;   // unlimited tournaments
-  export: boolean;      // DB export
-  telegram: boolean;    // Telegram posting
+  noAds: boolean;
+  pro:   boolean;
 }
 
-const FREE_ENTITLEMENTS: Entitlements = {
-  unlimited: false,
-  export:    true,
-  telegram:  false,
-};
+const FREE: Entitlements = { noAds: false, pro: false };
+let _current: Entitlements = FREE;
+const _listeners = new Set<(e: Entitlements) => void>();
 
-const PRO_ENTITLEMENTS: Entitlements = {
-  unlimited: true,
-  export:    true,
-  telegram:  true,
-};
-
-let _override: Entitlements | null = null;
-
-// Call during app init when RevenueCat is wired up.
-export function setEntitlements(e: Entitlements): void {
-  _override = e;
+export function subscribeEntitlements(fn: (e: Entitlements) => void): () => void {
+  _listeners.add(fn);
+  return () => _listeners.delete(fn);
 }
 
 export function getEntitlements(): Entitlements {
-  // Until RevenueCat is configured, return pro so nothing is gated during dev.
-  return _override ?? PRO_ENTITLEMENTS;
+  return _current;
 }
 
-export { FREE_ENTITLEMENTS, PRO_ENTITLEMENTS };
+function parse(info: unknown): Entitlements {
+  try {
+    const active = (info as any)?.entitlements?.active ?? {};
+    const noAds = RC_ENTITLEMENT_NO_ADS in active || RC_ENTITLEMENT_PRO in active;
+    const pro   = RC_ENTITLEMENT_PRO in active;
+    return { noAds, pro };
+  } catch {
+    return FREE;
+  }
+}
+
+export async function initRevenueCat(): Promise<void> {
+  if (!Capacitor.isNativePlatform()) return;
+  try {
+    await Purchases.setLogLevel({ level: LOG_LEVEL.ERROR });
+    await Purchases.configure({ apiKey: REVENUECAT_API_KEY_IOS });
+    await Purchases.addCustomerInfoUpdateListener((customerInfo) => {
+      _current = parse(customerInfo);
+      _listeners.forEach((fn) => fn(_current));
+    });
+    const { customerInfo } = await Purchases.getCustomerInfo();
+    _current = parse(customerInfo);
+    _listeners.forEach((fn) => fn(_current));
+  } catch {
+    // Placeholder key or simulator — stays on free tier
+  }
+}
