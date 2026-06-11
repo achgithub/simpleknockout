@@ -108,31 +108,36 @@ export async function importKnockout(jsonText: string): Promise<Tournament> {
   const idMap = new Map<string, string>();
   const now = Date.now();
 
+  // Collect every write into a single set so a malformed/partial import file
+  // can never leave half a tournament behind — it all commits or none does.
+  const set: { statement: string; values: unknown[] }[] = [];
+
   for (const e of data.entries) {
     const newEntryId = uuid();
     idMap.set(e.localId, newEntryId);
 
-    await db.run(
-      'INSERT INTO entries (id,tournament_id,display_name,seed,is_bye,created_at) VALUES (?,?,?,?,?,?)',
-      [newEntryId, t.id, e.displayName, e.seed ?? null, e.isBye ? 1 : 0, now],
-    );
+    set.push({
+      statement: 'INSERT INTO entries (id,tournament_id,display_name,seed,is_bye,created_at) VALUES (?,?,?,?,?,?)',
+      values: [newEntryId, t.id, e.displayName, e.seed ?? null, e.isBye ? 1 : 0, now],
+    });
 
     for (const p of e.players) {
-      await db.run(
-        'INSERT INTO entry_players (id,entry_id,name,slot) VALUES (?,?,?,?)',
-        [uuid(), newEntryId, p.name, p.slot],
-      );
+      set.push({
+        statement: 'INSERT INTO entry_players (id,entry_id,name,slot) VALUES (?,?,?,?)',
+        values: [uuid(), newEntryId, p.name, p.slot],
+      });
     }
   }
 
   // Insert matches using remapped IDs
   for (const m of data.matches) {
-    await db.run(
-      `INSERT INTO knockout_matches
-       (id,tournament_id,round,position,entry1_id,entry2_id,winner_id,
-        score1,score2,status,is_bye,is_third_place)
-       VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
-      [
+    set.push({
+      statement:
+        `INSERT INTO knockout_matches
+         (id,tournament_id,round,position,entry1_id,entry2_id,winner_id,
+          score1,score2,status,is_bye,is_third_place)
+         VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
+      values: [
         uuid(), t.id, m.round, m.position,
         m.entry1LocalId ? (idMap.get(m.entry1LocalId) ?? null) : null,
         m.entry2LocalId ? (idMap.get(m.entry2LocalId) ?? null) : null,
@@ -142,11 +147,16 @@ export async function importKnockout(jsonText: string): Promise<Tournament> {
         m.isBye ? 1 : 0,
         m.isThirdPlace ? 1 : 0,
       ],
-    );
+    });
   }
 
   // Set status to 'knockout' so it lands on the bracket immediately
-  await db.run("UPDATE tournaments SET status = 'knockout' WHERE id = ?", [t.id]);
+  set.push({
+    statement: "UPDATE tournaments SET status = 'knockout' WHERE id = ?",
+    values: [t.id],
+  });
+
+  await db.executeSet(set, true);
 
   return { ...t, status: 'knockout' };
 }

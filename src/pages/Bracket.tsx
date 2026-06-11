@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { toPng } from 'html-to-image';
+import html2canvas from 'html2canvas';
 import { Layout } from '@/components/Layout';
 import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
@@ -16,6 +16,7 @@ import {
   type BracketRound,
 } from '@/lib/bracket';
 import { useInterstitialAd } from '@/hooks/useInterstitialAd';
+import { useRewardedAd } from '@/hooks/useRewardedAd';
 import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
@@ -43,14 +44,31 @@ export function Bracket() {
   const captureRef    = useRef<HTMLDivElement>(null);
   const didScroll     = useRef(false);
   const { showAd }    = useInterstitialAd();
+  const { showRewardedAd } = useRewardedAd();
   const [capturing,   setCapturing] = useState(false);
 
   const captureAndShare = async () => {
     if (!captureRef.current || capturing) return;
     setCapturing(true);
     try {
-      await showAd();
-      const dataUrl = await toPng(captureRef.current, { pixelRatio: 2, backgroundColor: '#ffffff' });
+      // Gate sharing behind a rewarded video: the user watches to unlock the
+      // export. The rewarded ad resolves only once it has fully dismissed, so
+      // the share sheet that follows never collides with the ad modal.
+      const unlocked = await showRewardedAd();
+      if (!unlocked) return; // user closed the ad early — nothing to share
+
+      // Wait for fonts/emoji to be ready so the capture isn't missing glyphs.
+      if (document.fonts?.ready) await document.fonts.ready;
+      // html2canvas paints the DOM directly to a canvas. We use this instead of
+      // html-to-image because the latter rasterizes blank in WKWebView (its SVG
+      // <foreignObject> rendering path is broken on iOS).
+      const canvas = await html2canvas(captureRef.current, {
+        backgroundColor: '#ffffff',
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+      const dataUrl = canvas.toDataURL('image/png');
       const base64  = dataUrl.split(',')[1]!;
       if (Capacitor.isNativePlatform()) {
         const filename = `bracket-${tournament?.name ?? 'knockout'}.png`
@@ -60,17 +78,24 @@ export function Bracket() {
           data: base64,
           directory: Directory.Cache,
         });
-        await Share.share({ files: [uri], title: tournament?.name ?? 'Bracket' });
+        try {
+          await Share.share({ files: [uri], title: tournament?.name ?? 'Bracket' });
+        } catch (shareErr) {
+          // The user dismissing the share sheet rejects — that's not an error.
+          if (!/cancel/i.test((shareErr as Error).message)) throw shareErr;
+        }
       } else {
         const a  = document.createElement('a');
         a.href   = dataUrl;
         a.download = 'bracket.png';
         a.click();
       }
-    } catch {
-      // silently ignore share cancellation
+    } catch (e) {
+      // Surface real failures (e.g. image generation) instead of failing silently.
+      alert(t('bracket.shareError', { message: (e as Error).message }));
+    } finally {
+      setCapturing(false);
     }
-    setCapturing(false);
   };
 
   const load = async () => {
@@ -197,16 +222,19 @@ export function Bracket() {
           fontFamily: 'system-ui, -apple-system, sans-serif',
         }}
       >
-        {/* Tournament header */}
+        {/* Tournament header — name first so the recipient immediately sees
+            which tournament this bracket belongs to, with the game beneath. */}
         <div style={{ marginBottom: '20px', borderBottom: '1px solid #e5e7eb', paddingBottom: '12px' }}>
-          <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '4px' }}>
+          <p style={{ fontSize: '22px', fontWeight: 700, color: '#111827', lineHeight: 1.2 }}>{tournament?.name}</p>
+          <p style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500, marginTop: '4px' }}>
             {tournament?.game}
           </p>
-          <p style={{ fontSize: '20px', fontWeight: 700, color: '#111827' }}>{tournament?.name}</p>
         </div>
 
-        {/* All rounds */}
+        {/* Only the round currently being viewed — so each share is just that
+            round (e.g. "Last 64"), not the entire bracket. */}
         {rounds.map((round, rIdx) => {
+          if (rIdx !== currentPage) return null;
           const isFinalRound = rIdx === rounds.length - 1;
           return (
             <div key={round.round} style={{ marginBottom: '20px' }}>
@@ -255,8 +283,8 @@ export function Bracket() {
           );
         })}
 
-        {/* 3rd place playoff */}
-        {thirdPlace && (
+        {/* 3rd place playoff — only on the final round's share */}
+        {thirdPlace && currentPage === rounds.length - 1 && (
           <div style={{ marginBottom: '20px' }}>
             <p style={{ fontSize: '11px', fontWeight: 600, color: '#6b7280', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '8px' }}>
               {t('bracket.thirdPlacePlayoff')}
@@ -281,8 +309,8 @@ export function Bracket() {
           </div>
         )}
 
-        {/* Winner banner */}
-        {isCompleted && winner && (
+        {/* Winner banner — only on the final round's share */}
+        {isCompleted && winner && currentPage === rounds.length - 1 && (
           <div style={{ backgroundColor: '#fffbeb', border: '2px solid #fcd34d', borderRadius: '16px', padding: '20px', textAlign: 'center' }}>
             <div style={{ fontSize: '36px', marginBottom: '8px' }}>🏆</div>
             <div style={{ fontSize: '18px', fontWeight: 700, color: '#111827' }}>{winner}</div>

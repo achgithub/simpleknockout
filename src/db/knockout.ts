@@ -53,21 +53,24 @@ export async function getMatch(id: string): Promise<KnockoutMatch | null> {
 export async function insertMatches(
   matches: Omit<KnockoutMatch, 'id'>[],
 ): Promise<void> {
+  if (matches.length === 0) return;
   const db = await getDb();
-  for (const m of matches) {
-    await db.run(
-      `INSERT INTO knockout_matches
-       (id,tournament_id,round,position,entry1_id,entry2_id,winner_id,
-        score1,score2,status,is_bye,is_third_place)
-       VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
-      [
-        uuid(), m.tournamentId, m.round, m.position,
-        m.entry1Id, m.entry2Id, m.winnerId,
-        m.score1, m.score2, m.status,
-        m.isBye ? 1 : 0, m.isThirdPlace ? 1 : 0,
-      ],
-    );
-  }
+  // One atomic batch — a partially-written bracket is never persisted.
+  const statement =
+    `INSERT INTO knockout_matches
+     (id,tournament_id,round,position,entry1_id,entry2_id,winner_id,
+      score1,score2,status,is_bye,is_third_place)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`;
+  const set = matches.map((m) => ({
+    statement,
+    values: [
+      uuid(), m.tournamentId, m.round, m.position,
+      m.entry1Id, m.entry2Id, m.winnerId,
+      m.score1, m.score2, m.status,
+      m.isBye ? 1 : 0, m.isThirdPlace ? 1 : 0,
+    ],
+  }));
+  await db.executeSet(set, true);
 }
 
 export async function setMatchResult(

@@ -154,24 +154,34 @@ export async function createGroups(
     name: `Group ${name}`,
   }));
 
-  for (const g of groups) {
-    await db.run('INSERT INTO groups (id,tournament_id,name) VALUES (?,?,?)', [g.id, g.tournamentId, g.name]);
-  }
-
-  // Distribute entries round-robin across groups
+  // Build the membership for each group in memory (round-robin distribution)
+  // so the whole thing can be written in a single atomic batch below.
+  const memberIdsByGroup = new Map<string, string[]>(groups.map((g) => [g.id, []]));
   for (let i = 0; i < shuffled.length; i++) {
-    const groupId = groups[i % groupCount]!.id;
-    await db.run('INSERT INTO group_members (group_id,entry_id) VALUES (?,?)', [groupId, shuffled[i]!.id]);
+    memberIdsByGroup.get(groups[i % groupCount]!.id)!.push(shuffled[i]!.id);
   }
 
-  // Generate round-robin fixtures for each group
   const { generateRoundRobin } = await import('@/lib/scheduler');
   const now = Date.now();
   const BYE = '__BYE__';
 
+  const set: { statement: string; values: unknown[] }[] = [];
+
   for (const g of groups) {
-    const memberRes = await db.query('SELECT entry_id FROM group_members WHERE group_id = ?', [g.id]);
-    const memberIds = (memberRes.values ?? []).map((r) => r['entry_id'] as string);
+    set.push({
+      statement: 'INSERT INTO groups (id,tournament_id,name) VALUES (?,?,?)',
+      values: [g.id, g.tournamentId, g.name],
+    });
+  }
+
+  for (const g of groups) {
+    const memberIds = memberIdsByGroup.get(g.id)!;
+    for (const entryId of memberIds) {
+      set.push({
+        statement: 'INSERT INTO group_members (group_id,entry_id) VALUES (?,?)',
+        values: [g.id, entryId],
+      });
+    }
 
     // generateRoundRobin requires an even number of teams. For odd-sized groups,
     // pad with a placeholder "bye" slot — fixtures involving it are dropped, so
@@ -181,11 +191,15 @@ export async function createGroups(
     const fixtures = generateRoundRobin(scheduleIds);
     for (const f of fixtures) {
       if (f.homeTeamId === BYE || f.awayTeamId === BYE) continue;
-      await db.run(
-        `INSERT INTO group_fixtures (id,group_id,tournament_id,entry1_id,entry2_id,result,score1,score2,round,created_at)
-         VALUES (?,?,?,?,?,?,?,?,?,?)`,
-        [uuid(), g.id, tournamentId, f.homeTeamId, f.awayTeamId, null, null, null, f.week, now],
-      );
+      set.push({
+        statement:
+          `INSERT INTO group_fixtures (id,group_id,tournament_id,entry1_id,entry2_id,result,score1,score2,round,created_at)
+           VALUES (?,?,?,?,?,?,?,?,?,?)`,
+        values: [uuid(), g.id, tournamentId, f.homeTeamId, f.awayTeamId, null, null, null, f.week, now],
+      });
     }
   }
+
+  // Groups, members and fixtures all commit together or not at all.
+  await db.executeSet(set, true);
 }

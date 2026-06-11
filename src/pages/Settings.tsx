@@ -5,7 +5,6 @@ import { Layout } from '@/components/Layout';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { getTournament, updateTournamentSettings, deleteTournament, type Tournament } from '@/db/tournaments';
-import { Capacitor } from '@capacitor/core';
 
 export function Settings() {
   const { id } = useParams<{ id: string }>();
@@ -46,18 +45,6 @@ export function Settings() {
     navigate('/', { replace: true });
   };
 
-  const exportDb = async () => {
-    if (!Capacitor.isNativePlatform()) {
-      alert(t('settings.exportNativeOnly'));
-      return;
-    }
-    // PLACEHOLDER: export SQLite DB file via Capacitor Share plugin.
-    // import { Share } from '@capacitor/share';
-    // const dbPath = `Library/CapacitorDatabase/simpleknockout.db`;
-    // await Share.share({ title: 'simpleknockout.db', url: dbPath });
-    alert(t('settings.exportPlaceholder'));
-  };
-
   if (!tournament) return null;
 
   return (
@@ -96,13 +83,6 @@ export function Settings() {
         <Button onClick={() => void save()} disabled={saving} fullWidth>
           {saving ? t('common.saving') : t('common.save')}
         </Button>
-
-        <Card className="p-4 flex flex-col gap-3">
-          <h2 className="font-semibold text-gray-700 text-sm uppercase tracking-wide">{t('settings.data')}</h2>
-          <Button variant="secondary" onClick={() => void exportDb()} fullWidth>
-            {t('settings.exportDatabase')}
-          </Button>
-        </Card>
 
         <Button variant="danger" onClick={() => void handleDelete()} fullWidth>
           {t('settings.deleteTournament')}

@@ -1,4 +1,8 @@
 {
+  "splash": {
+    "title": "SimpleKnockout",
+    "tagline": "Organiza cualquier torneo desde tu teléfono"
+  },
   "common": {
     "back": "‹ Atrás",
     "cancel": "Cancelar",
@@ -122,6 +126,7 @@
   "bracket": {
     "title": "Cuadro",
     "shareBracket": "Compartir cuadro",
+    "shareError": "No se pudo crear la imagen del cuadro: {{message}}",
     "thirdPlacePlayoff": "Tercer y cuarto puesto",
     "tournamentChampion": "Campeón del torneo",
     "final": "⚡ Final",
@@ -154,11 +159,7 @@
     "telegramDescription": "Crea un bot con @BotFather, añádelo a tu canal como administrador y pega aquí las credenciales.",
     "botTokenPlaceholder": "Token del bot (123456:ABC-...)",
     "channelIdPlaceholder": "ID del canal (p. ej. @micanal o -100123456789)",
-    "data": "Datos",
-    "exportDatabase": "Exportar base de datos",
-    "exportNativeOnly": "La exportación de la base de datos solo está disponible en el dispositivo.",
-    "exportPlaceholder": "Exportar: configura @capacitor/share apuntando al archivo de base de datos SQLite.",
-    "deleteTournament": "Eliminar torneo",
+    "deleteTournament":"Eliminar torneo",
     "confirmDelete": "¿Eliminar este torneo? Esta acción no se puede deshacer."
   },
   "diagnostics": {

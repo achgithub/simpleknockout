@@ -1,4 +1,8 @@
 {
+  "splash": {
+    "title": "SimpleKnockout",
+    "tagline": "Run any tournament from your phone"
+  },
   "common": {
     "back": "‹ Back",
     "cancel": "Cancel",
@@ -122,6 +126,7 @@
   "bracket": {
     "title": "Bracket",
     "shareBracket": "Share bracket",
+    "shareError": "Couldn’t create the bracket image: {{message}}",
     "thirdPlacePlayoff": "3rd Place Playoff",
     "tournamentChampion": "Tournament Champion",
     "final": "⚡ Final",
@@ -154,10 +159,6 @@
     "telegramDescription": "Create a bot via @BotFather, add it to your channel as admin, then paste the credentials below.",
     "botTokenPlaceholder": "Bot token (123456:ABC-...)",
     "channelIdPlaceholder": "Channel ID (e.g. @mychannel or -100123456789)",
-    "data": "Data",
-    "exportDatabase": "Export Database",
-    "exportNativeOnly": "DB export is only available on device.",
-    "exportPlaceholder": "Export: wire up @capacitor/share pointing to the SQLite DB file.",
     "deleteTournament": "Delete Tournament",
     "confirmDelete": "Delete this tournament? This cannot be undone."
   },

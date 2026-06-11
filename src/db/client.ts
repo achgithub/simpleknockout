@@ -68,9 +68,9 @@ CREATE TABLE IF NOT EXISTS group_fixtures (
   id             TEXT PRIMARY KEY,
   group_id       TEXT NOT NULL REFERENCES groups(id) ON DELETE CASCADE,
   tournament_id  TEXT NOT NULL,
-  entry1_id      TEXT NOT NULL REFERENCES entries(id),
-  entry2_id      TEXT NOT NULL REFERENCES entries(id),
-  result         TEXT CHECK(result IN ('entry1','entry2','draw',NULL)),
+  entry1_id      TEXT NOT NULL REFERENCES entries(id) ON DELETE CASCADE,
+  entry2_id      TEXT NOT NULL REFERENCES entries(id) ON DELETE CASCADE,
+  result         TEXT CHECK(result IS NULL OR result IN ('entry1','entry2','draw')),
   score1         INTEGER,
   score2         INTEGER,
   round          INTEGER NOT NULL,
@@ -82,9 +82,9 @@ CREATE TABLE IF NOT EXISTS knockout_matches (
   tournament_id   TEXT NOT NULL REFERENCES tournaments(id) ON DELETE CASCADE,
   round           INTEGER NOT NULL,
   position        INTEGER NOT NULL,
-  entry1_id       TEXT REFERENCES entries(id),
-  entry2_id       TEXT REFERENCES entries(id),
-  winner_id       TEXT REFERENCES entries(id),
+  entry1_id       TEXT REFERENCES entries(id) ON DELETE CASCADE,
+  entry2_id       TEXT REFERENCES entries(id) ON DELETE CASCADE,
+  winner_id       TEXT REFERENCES entries(id) ON DELETE SET NULL,
   score1          INTEGER,
   score2          INTEGER,
   status          TEXT NOT NULL DEFAULT 'pending',
@@ -114,6 +114,14 @@ CREATE TABLE IF NOT EXISTS user_group_members (
   group_id TEXT NOT NULL REFERENCES user_groups(id) ON DELETE CASCADE,
   PRIMARY KEY (user_id, group_id)
 );
+
+-- Indexes on the foreign-key / filter columns every read narrows by.
+CREATE INDEX IF NOT EXISTS idx_entries_tournament       ON entries(tournament_id);
+CREATE INDEX IF NOT EXISTS idx_entry_players_entry       ON entry_players(entry_id);
+CREATE INDEX IF NOT EXISTS idx_groups_tournament         ON groups(tournament_id);
+CREATE INDEX IF NOT EXISTS idx_group_members_group       ON group_members(group_id);
+CREATE INDEX IF NOT EXISTS idx_group_fixtures_group      ON group_fixtures(group_id);
+CREATE INDEX IF NOT EXISTS idx_knockout_matches_tournament ON knockout_matches(tournament_id);
 `;
 
 async function runMigrations(conn: SQLiteDBConnection): Promise<void> {
@@ -125,4 +133,15 @@ async function runMigrations(conn: SQLiteDBConnection): Promise<void> {
   const colNames = new Set((cols.values ?? []).map((r) => r['name'] as string));
   if (!colNames.has('score1')) await conn.execute('ALTER TABLE group_fixtures ADD COLUMN score1 INTEGER');
   if (!colNames.has('score2')) await conn.execute('ALTER TABLE group_fixtures ADD COLUMN score2 INTEGER');
+}
+
+/**
+ * Full database backup as a JSON string. Used by Settings → "Export Database".
+ * The shape is @capacitor-community/sqlite's own import/export format, so the
+ * same file can be re-imported later via `importFromJson` if needed.
+ */
+export async function exportDatabaseJson(): Promise<string> {
+  const conn = await getDb();
+  const { export: jsonExport } = await conn.exportToJson('full');
+  return JSON.stringify(jsonExport, null, 2);
 }

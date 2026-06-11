@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useDbReady } from '@/hooks/useDb';
+import { Splash } from '@/components/Splash';
 import { Home } from '@/pages/Home';
 import { NewTournament } from '@/pages/NewTournament';
 import { Dashboard } from '@/pages/Dashboard';
@@ -15,8 +17,29 @@ import { AdBanner } from '@/components/AdBanner';
 
 const TAB_PATHS = ['/', '/players', '/settings'];
 
+// Minimum time the splash stays up so it doesn't flash on fast launches.
+const SPLASH_MIN_MS = 1200;
+// Duration of the splash fade-out — keep in sync with Splash's transition.
+const SPLASH_FADE_MS = 500;
+
 export function App() {
   const { ready, error } = useDbReady();
+  const [splashElapsed, setSplashElapsed] = useState(false);
+  const [splashGone, setSplashGone] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setSplashElapsed(true), SPLASH_MIN_MS);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const appReady = ready && splashElapsed;
+
+  // Once the app is ready, fade the splash out, then unmount it.
+  useEffect(() => {
+    if (!appReady) return;
+    const timer = setTimeout(() => setSplashGone(true), SPLASH_FADE_MS);
+    return () => clearTimeout(timer);
+  }, [appReady]);
 
   if (error) {
     return (
@@ -27,15 +50,12 @@ export function App() {
     );
   }
 
-  if (!ready) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-gray-400 text-sm">Loading…</p>
-      </div>
-    );
-  }
-
-  return <Shell />;
+  return (
+    <>
+      {appReady && <Shell />}
+      {!splashGone && <Splash exiting={appReady} />}
+    </>
+  );
 }
 
 // Single root shell: scrollable routed content, with the TabBar (on tab
